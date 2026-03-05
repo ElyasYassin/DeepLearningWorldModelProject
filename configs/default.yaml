@@ -1,0 +1,45 @@
+# Default configuration for all components.
+# Override values by creating experiment-specific configs that import this one.
+
+env:
+  engine: mujoco          # isaac_sim | mujoco | gazebo
+  image_size: 64          # Height and width of RGB observations (pixels)
+  max_episode_steps: 500
+
+encoder:
+  latent_dim: 128
+  learning_rate: 1.0e-4
+  batch_size: 32
+  epochs: 50
+
+dynamics:
+  d_model: 256
+  nhead: 4
+  num_layers: 4
+  max_seq_len: 64
+  learning_rate: 1.0e-4
+  batch_size: 32
+  epochs: 50
+
+controller:
+  hidden_dim: 256
+  learning_rate: 3.0e-4
+  gamma: 0.99
+  imagination_horizon: 15   # Steps to roll out in latent space per update
+
+baselines:
+  ppo:
+    learning_rate: 3.0e-4
+    n_steps: 2048
+    batch_size: 64
+    n_epochs: 10
+    total_timesteps: 1_000_000
+  sac:
+    learning_rate: 3.0e-4
+    buffer_size: 1_000_000
+    batch_size: 256
+    total_timesteps: 1_000_000
+
+evaluation:
+  n_eval_episodes: 20
+  log_dir: logs/
