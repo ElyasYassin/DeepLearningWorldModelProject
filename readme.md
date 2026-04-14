@@ -36,13 +36,7 @@ An RL policy trained entirely in latent space to select actions that maximize cu
 
 ## Simulation Environment
 
-The digital twin is built in one of the following simulation engines (to be finalized in Phase 1):
-
-| Engine | Notes |
-|--------|-------|
-| [NVIDIA Isaac Sim](https://developer.nvidia.com/isaac-sim) | Photorealistic, strong ROS2 support |
-| [MuJoCo](https://mujoco.org/) | Lightweight, widely used in RL research |
-| [Gazebo](https://gazebosim.org/) | Open-source, strong ROS ecosystem |
+Built on [MuJoCo](https://mujoco.org/) via [robosuite](https://github.com/ElyasYassin/robosuite). The task is `TargetTracking` — a Panda arm must reach and hold its end-effector at a static target position, observed through a 64×64 RGB camera.
 
 ---
 
@@ -111,7 +105,71 @@ DeepLearningWorldModelProject/
 
 ## Getting Started
 
-> Setup instructions will be added as the simulation environment and dependencies are finalized in Phase 1.
+### Prerequisites
+
+- Python 3.10+
+- MuJoCo (installed automatically with robosuite)
+- A CUDA-capable GPU is recommended for training
+
+### Installation
+
+**1. Clone the repo**
+```bash
+git clone <this-repo>
+cd DeepLearningWorldModelProject
+```
+
+**2. Create and activate a virtual environment**
+```bash
+python -m venv venv
+
+# PowerShell
+venv\Scripts\Activate.ps1
+
+# CMD
+venv\Scripts\activate.bat
+
+# bash / Git Bash
+source venv/Scripts/activate
+```
+
+**3. Install PyTorch** (match your CUDA version at [pytorch.org](https://pytorch.org))
+```bash
+# Example for CUDA 12.4:
+pip install torch --index-url https://download.pytorch.org/whl/cu124
+```
+
+**4. Install the project and remaining dependencies**
+```bash
+pip install -e .
+pip install -r requirements.txt
+```
+
+### Smoke test
+
+```bash
+python -c "
+import yaml
+from sim.env import RoboticArmEnv
+cfg = yaml.safe_load(open('configs/default.yaml'))
+env = RoboticArmEnv(cfg)
+obs, _ = env.reset()
+print('obs shape:', obs.shape)  # (64, 64, 3)
+env.close()
+"
+```
+
+### Running training
+
+```bash
+# Stage 1 — PPO on raw pixels
+python baselines/ppo_baseline.py configs/default.yaml
+
+# Stage 2 / 3 — world model pipeline (in order)
+python training/train_encoder.py configs/default.yaml
+python training/train_dynamics.py configs/default.yaml
+python training/train_controller.py configs/default.yaml
+```
 
 ---
 

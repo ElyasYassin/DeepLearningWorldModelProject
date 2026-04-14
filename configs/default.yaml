@@ -2,9 +2,11 @@
 # Override values by creating experiment-specific configs that import this one.
 
 env:
-  engine: mujoco          # isaac_sim | mujoco | gazebo
+  engine: mujoco          # mujoco only
   image_size: 64          # Height and width of RGB observations (pixels)
   max_episode_steps: 500
+  robot: Panda            # robosuite robot model
+  camera_name: robot0_eye_in_hand  # wrist-mounted camera on the Panda end-effector
 
 encoder:
   latent_dim: 128
