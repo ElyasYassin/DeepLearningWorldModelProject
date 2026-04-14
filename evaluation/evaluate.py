@@ -22,9 +22,18 @@ import numpy as np
 import cv2
 
 from stable_baselines3 import PPO
+from sb3_contrib import RecurrentPPO
 
 from sim.env import RoboticArmEnv
 from evaluation.metrics import tracking_accuracy, fluidity
+
+
+def load_model(model_path: str, env):
+    """Load a PPO or RecurrentPPO model, detecting type from the zip."""
+    try:
+        return RecurrentPPO.load(model_path, env=env), True
+    except Exception:
+        return PPO.load(model_path, env=env), False
 
 RENDER_CAMERAS = {
     ord("1"): "agentview",
@@ -44,7 +53,11 @@ def _get_render_frame(env: RoboticArmEnv, camera: str) -> np.ndarray:
 
 def evaluate(config: dict, model_path: str | None, n_episodes: int, render: bool = False):
     env = RoboticArmEnv(config)
-    model = None if model_path is None else PPO.load(model_path, env=env)
+    is_recurrent = False
+    if model_path is None:
+        model = None
+    else:
+        model, is_recurrent = load_model(model_path, env)
 
     ep_rewards = []
     ep_distances = []
@@ -60,10 +73,17 @@ def evaluate(config: dict, model_path: str | None, n_episodes: int, render: bool
         total_reward = 0.0
         distances = []
         joint_positions = []
+        lstm_states = None      # only used by RecurrentPPO
+        episode_start = True
 
         while not done:
             if model is None:
                 action = env.action_space.sample()
+            elif is_recurrent:
+                action, lstm_states = model.predict(
+                    obs, state=lstm_states, episode_start=episode_start, deterministic=True
+                )
+                episode_start = False
             else:
                 action, _ = model.predict(obs, deterministic=True)
             obs, reward, terminated, truncated, info = env.step(action)

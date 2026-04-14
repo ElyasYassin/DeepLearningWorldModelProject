@@ -36,6 +36,14 @@ baselines:
     batch_size: 64
     n_epochs: 10
     total_timesteps: 1_000_000
+  ppo_lstm:
+    learning_rate: 1.0e-4
+    n_steps: 2048           # steps per rollout (must be divisible by batch_size)
+    batch_size: 128         # sequences per update
+    n_epochs: 10
+    lstm_hidden_size: 256
+    n_lstm_layers: 1
+    total_timesteps: 1_000_000
   sac:
     learning_rate: 3.0e-4
     buffer_size: 1_000_000
