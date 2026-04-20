@@ -43,15 +43,18 @@ def train(config: dict):
         policy_kwargs=dict(
             lstm_hidden_size=lstm_cfg["lstm_hidden_size"],
             n_lstm_layers=lstm_cfg["n_lstm_layers"],
-            shared_lstm=False,      # separate LSTMs for policy and value heads
+            shared_lstm=False,  # separate LSTMs for policy and value heads
             enable_critic_lstm=True,
         ),
         verbose=1,
         tensorboard_log=log_dir,
     )
 
-    model.learn(total_timesteps=lstm_cfg["total_timesteps"])
-    model.save("ppo_lstm_target_tracking")
+    model.learn(
+        total_timesteps=lstm_cfg["total_timesteps"],
+        tb_log_name="lstm_ppo",
+    )
+    model.save("trained_models/ppo_lstm_target_tracking")
     env.close()
 
 

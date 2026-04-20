@@ -76,6 +76,16 @@ baselines:
     policy_hidden_sizes: [128]
     value_hidden_sizes: [128]
 
+  ppo_resnet18_ft:
+    learning_rate: 1.0e-4
+    n_steps: 2048
+    batch_size: 64
+    n_epochs: 10
+    gamma: 0.99
+    total_timesteps: 1_000_000
+    visual_dim: 128
+    policy_hidden_sizes: [256, 256]
+    value_hidden_sizes: [256, 256]
 
 evaluation:
   n_eval_episodes: 20

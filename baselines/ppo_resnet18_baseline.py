@@ -58,7 +58,7 @@ def train(config: dict):
         total_timesteps=ppo_cfg["total_timesteps"],
         tb_log_name="resnet18_ppo",
     )
-    model.save("ppo_resnet18_target_tracking")
+    model.save("trained_models/ppo_resnet18_target_tracking")
     env.close()
 
 
