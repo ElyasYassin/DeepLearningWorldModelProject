@@ -49,6 +49,33 @@ baselines:
     buffer_size: 1_000_000
     batch_size: 256
     total_timesteps: 1_000_000
+  
+  ppo_resnet18:
+    learning_rate: 3.0e-4
+    n_steps: 2048
+    batch_size: 64
+    n_epochs: 10
+    gamma: 0.99
+    total_timesteps: 1_000_000
+    visual_dim: 128
+    freeze_backbone: true
+    policy_hidden_sizes: [256, 256]
+    value_hidden_sizes: [256, 256]
+
+  ppo_resnet18_lstm:
+    learning_rate: 3.0e-4
+    n_steps: 512
+    batch_size: 64
+    n_epochs: 10
+    gamma: 0.99
+    total_timesteps: 1_000_000
+    visual_dim: 128
+    freeze_backbone: true
+    lstm_hidden_size: 128
+    n_lstm_layers: 1
+    policy_hidden_sizes: [128]
+    value_hidden_sizes: [128]
+
 
 evaluation:
   n_eval_episodes: 20
