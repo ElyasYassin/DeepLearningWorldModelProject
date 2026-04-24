@@ -35,6 +35,7 @@ def load_model(model_path: str, env):
     except Exception:
         return PPO.load(model_path, env=env), False
 
+
 RENDER_CAMERAS = {
     ord("1"): "agentview",
     ord("2"): "birdview",
@@ -47,11 +48,15 @@ RENDER_SIZE = 512
 def _get_render_frame(env: RoboticArmEnv, camera: str) -> np.ndarray:
     """Fetch a BGR frame from any robosuite camera for display."""
     # robosuite renders upside-down → flip vertically
-    rgb = env._env.sim.render(camera_name=camera, height=RENDER_SIZE, width=RENDER_SIZE)[::-1]
+    rgb = env._env.sim.render(
+        camera_name=camera, height=RENDER_SIZE, width=RENDER_SIZE
+    )[::-1]
     return cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
 
 
-def evaluate(config: dict, model_path: str | None, n_episodes: int, render: bool = False):
+def evaluate(
+    config: dict, model_path: str | None, n_episodes: int, render: bool = False
+):
     env = RoboticArmEnv(config)
     is_recurrent = False
     if model_path is None:
@@ -64,7 +69,7 @@ def evaluate(config: dict, model_path: str | None, n_episodes: int, render: bool
     ep_fluidity = []
     ep_successes = []
 
-    active_camera = "agentview"   # default render view
+    active_camera = "agentview"  # default render view
     quit_early = False
 
     for ep in range(n_episodes):
@@ -73,7 +78,7 @@ def evaluate(config: dict, model_path: str | None, n_episodes: int, render: bool
         total_reward = 0.0
         distances = []
         joint_positions = []
-        lstm_states = None      # only used by RecurrentPPO
+        lstm_states = None  # only used by RecurrentPPO
         episode_start = True
 
         while not done:
@@ -81,7 +86,10 @@ def evaluate(config: dict, model_path: str | None, n_episodes: int, render: bool
                 action = env.action_space.sample()
             elif is_recurrent:
                 action, lstm_states = model.predict(
-                    obs, state=lstm_states, episode_start=episode_start, deterministic=True
+                    obs,
+                    state=lstm_states,
+                    episode_start=episode_start,
+                    deterministic=True,
                 )
                 episode_start = False
             else:
@@ -98,7 +106,12 @@ def evaluate(config: dict, model_path: str | None, n_episodes: int, render: bool
                 cv2.putText(
                     frame,
                     f"[{active_camera}]  1=agentview  2=birdview  3=sideview  4=wrist  q=quit",
-                    (8, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1, cv2.LINE_AA,
+                    (8, 24),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.45,
+                    (255, 255, 255),
+                    1,
+                    cv2.LINE_AA,
                 )
                 cv2.imshow("TargetTracking", frame)
                 key = cv2.waitKey(1) & 0xFF
@@ -142,7 +155,9 @@ def evaluate(config: dict, model_path: str | None, n_episodes: int, render: bool
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("config", help="Path to YAML config file")
-    parser.add_argument("--model", default=None, help="Path to saved model. Omit to use random policy.")
+    parser.add_argument(
+        "--model", default=None, help="Path to saved model. Omit to use random policy."
+    )
     parser.add_argument("--episodes", type=int, default=20)
     parser.add_argument("--render", action="store_true")
     args = parser.parse_args()

@@ -43,8 +43,11 @@ def train(config: dict):
         tensorboard_log=log_dir,
     )
 
-    model.learn(total_timesteps=ppo_cfg["total_timesteps"])
-    model.save("ppo_target_tracking")
+    model.learn(
+        total_timesteps=ppo_cfg["total_timesteps"],
+        tb_log_name="ppo",
+    )
+    model.save("trained_models/ppo_target_tracking")
     env.close()
 
 

@@ -87,6 +87,7 @@ datasets/
 *.pt
 *.ckpt
 *.onnx
+*.zip
 
 # Keep small sample data if needed
 
@@ -98,7 +99,7 @@ datasets/
 
 # =========================
 
-models/
+trained_models/
 checkpoints/
 runs/
 wandb/
