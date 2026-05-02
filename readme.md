@@ -149,12 +149,13 @@ pip install -r requirements.txt
 
 ```bash
 python -c "
-import yaml
 from sim.env import RoboticArmEnv
-cfg = yaml.safe_load(open('configs/default.yaml'))
+from utils.config import load_config
+cfg = load_config('configs/default.yaml')
 env = RoboticArmEnv(cfg)
 obs, _ = env.reset()
-print('obs shape:', obs.shape)  # (64, 64, 3)
+print('image shape:', obs['image'].shape)
+print('proprio shape:', obs['proprio'].shape)
 env.close()
 "
 ```
@@ -163,12 +164,32 @@ env.close()
 
 ```bash
 # Stage 1 — PPO on raw pixels
-python baselines/ppo_baseline.py configs/default.yaml
+python -m baselines.ppo_baseline configs/experiments/ppo.yaml
 
 # Stage 2 / 3 — world model pipeline (in order)
-python training/train_encoder.py configs/default.yaml
-python training/train_dynamics.py configs/default.yaml
-python training/train_controller.py configs/default.yaml
+python -m training.train_encoder configs/default.yaml
+python -m training.train_dynamics configs/default.yaml
+python -m training.train_controller configs/default.yaml
+```
+
+### Baseline experiments and tuning
+
+```bash
+python -m baselines.ppo_lstm_baseline configs/experiments/ppo_lstm.yaml
+python -m baselines.ppo_resnet18_baseline configs/experiments/ppo_resnet18.yaml
+python -m baselines.ppo_resnet18_lstm_baseline configs/experiments/ppo_resnet18_lstm.yaml
+python -m baselines.ppo_resnet18_ft_baseline configs/experiments/ppo_resnet18_ft.yaml
+python -m baselines.ppo_resnet18_lstm_ft_baseline configs/experiments/ppo_resnet18_lstm_ft.yaml
+
+# Hyperparameter tuning example
+python -m baselines.ppo_resnet18_lstm_ft_baseline configs/tuning/lstm_ft_lr5e5.yaml
+```
+
+### Evaluation and logs
+
+```bash
+python -m evaluation.evaluate configs/tuning/lstm_ft_lr5e5.yaml --model trained_models/ppo_resnet18_lstm_ft_lr5e5_layer4_lstm128.zip --episodes 20
+tensorboard --logdir=logs
 ```
 
 ---

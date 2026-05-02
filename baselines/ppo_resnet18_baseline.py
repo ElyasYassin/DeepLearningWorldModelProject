@@ -8,12 +8,12 @@ Usage:
 """
 
 import sys
-import yaml
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecTransposeImage, VecMonitor
 
 from sim.env import RoboticArmEnv
 from models.resnet_proprio_extractor import ResnetProprioExtractor
+from utils.config import load_config
 
 
 def train(config: dict):
@@ -56,13 +56,12 @@ def train(config: dict):
 
     model.learn(
         total_timesteps=ppo_cfg["total_timesteps"],
-        tb_log_name="resnet18_ppo",
+        tb_log_name=ppo_cfg["tb_log_name"],
     )
-    model.save("trained_models/ppo_resnet18_target_tracking")
+    model.save(ppo_cfg["save_path"])
     env.close()
 
 
 if __name__ == "__main__":
-    with open(sys.argv[1], "r") as f:
-        config = yaml.safe_load(f)
+    config = load_config(sys.argv[1])
     train(config)

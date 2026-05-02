@@ -1,14 +1,27 @@
-import sys
-from sb3_contrib import RecurrentPPO
-from stable_baselines3.common.vec_env import DummyVecEnv, VecTransposeImage, VecMonitor
+"""
+Recurrent PPO baseline with a fine-tuned ResNet-18 visual backbone.
 
+This combines:
+    image -> pretrained ResNet-18 with selected layers unfrozen
+    proprio -> direct input
+    [visual features ; proprio] -> LSTM policy -> action
+
+Usage:
+    python baselines/ppo_resnet18_lstm_ft_baseline.py configs/default.yaml
+"""
+
+import sys
+
+from sb3_contrib import RecurrentPPO
+from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor, VecTransposeImage
+
+from models.resnet_proprio_extractor_ft import ResnetProprioExtractorFT
 from sim.env import RoboticArmEnv
-from models.resnet_proprio_extractor import ResnetProprioExtractor
 from utils.config import load_config
 
 
 def train(config: dict):
-    cfg = config["baselines"]["ppo_resnet18_lstm"]
+    cfg = config["baselines"]["ppo_resnet18_lstm_ft"]
     log_dir = config["evaluation"]["log_dir"]
 
     def make_env():
@@ -19,13 +32,15 @@ def train(config: dict):
     env = VecMonitor(env)
 
     policy_kwargs = dict(
-        features_extractor_class=ResnetProprioExtractor,
+        features_extractor_class=ResnetProprioExtractorFT,
         features_extractor_kwargs=dict(
             visual_dim=cfg["visual_dim"],
-            freeze_backbone=cfg["freeze_backbone"],
+            unfreeze_layers=cfg["unfreeze_layers"],
         ),
         lstm_hidden_size=cfg["lstm_hidden_size"],
         n_lstm_layers=cfg["n_lstm_layers"],
+        shared_lstm=False,
+        enable_critic_lstm=True,
         net_arch=dict(
             pi=cfg["policy_hidden_sizes"],
             vf=cfg["value_hidden_sizes"],
@@ -50,6 +65,7 @@ def train(config: dict):
         tb_log_name=cfg["tb_log_name"],
     )
     model.save(cfg["save_path"])
+
     env.close()
 
 

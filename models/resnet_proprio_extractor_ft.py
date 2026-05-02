@@ -11,6 +11,7 @@ class ResnetProprioExtractorFT(BaseFeaturesExtractor):
         self,
         observation_space: gym.spaces.Dict,
         visual_dim: int = 128,
+        unfreeze_layers: list[str] | None = None,
     ):
         self.image_space = observation_space.spaces["image"]
         self.proprio_space = observation_space.spaces["proprio"]
@@ -30,13 +31,11 @@ class ResnetProprioExtractorFT(BaseFeaturesExtractor):
         for param in self.backbone.parameters():
             param.requires_grad = False
 
-        # Unfreeze only the last residual block: layer4
-        for param in self.backbone.layer4.parameters():
-            param.requires_grad = True
+        if unfreeze_layers is None:
+            unfreeze_layers = ["layer4"]
 
-        # Optional: also unfreeze final batchnorm if needed later
-        # for param in self.backbone.layer3.parameters():
-        #     param.requires_grad = True
+        for name, param in self.backbone.named_parameters():
+            param.requires_grad = any(layer in name for layer in unfreeze_layers)
 
         self.visual_proj = nn.Linear(512, visual_dim)
 

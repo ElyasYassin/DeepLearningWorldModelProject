@@ -12,12 +12,12 @@ Usage:
 """
 
 import sys
-import yaml
 
 from sb3_contrib import RecurrentPPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecTransposeImage, VecMonitor
 
 from sim.env import RoboticArmEnv
+from utils.config import load_config
 
 
 def train(config: dict):
@@ -52,13 +52,12 @@ def train(config: dict):
 
     model.learn(
         total_timesteps=lstm_cfg["total_timesteps"],
-        tb_log_name="lstm_ppo",
+        tb_log_name=lstm_cfg["tb_log_name"],
     )
-    model.save("trained_models/ppo_lstm_target_tracking")
+    model.save(lstm_cfg["save_path"])
     env.close()
 
 
 if __name__ == "__main__":
-    with open(sys.argv[1]) as f:
-        config = yaml.safe_load(f)
+    config = load_config(sys.argv[1])
     train(config)

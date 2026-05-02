@@ -11,7 +11,9 @@ def train(config: dict):
 
 
 if __name__ == "__main__":
-    import yaml, sys
-    with open(sys.argv[1]) as f:
-        config = yaml.safe_load(f)
+    import sys
+
+    from utils.config import load_config
+
+    config = load_config(sys.argv[1])
     train(config)
