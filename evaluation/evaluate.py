@@ -17,7 +17,6 @@ Render controls (when --render is active):
 """
 
 import argparse
-import yaml
 import numpy as np
 import cv2
 
@@ -26,6 +25,7 @@ from sb3_contrib import RecurrentPPO
 
 from sim.env import RoboticArmEnv
 from evaluation.metrics import tracking_accuracy, fluidity
+from utils.config import load_config
 
 
 def load_model(model_path: str, env):
@@ -162,7 +162,6 @@ if __name__ == "__main__":
     parser.add_argument("--render", action="store_true")
     args = parser.parse_args()
 
-    with open(args.config) as f:
-        config = yaml.safe_load(f)
+    config = load_config(args.config)
 
     evaluate(config, args.model, args.episodes, args.render)

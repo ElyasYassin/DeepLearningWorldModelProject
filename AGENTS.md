@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Project
 
@@ -102,7 +102,7 @@ MuJoCo is the only supported engine (`env.engine: mujoco`). `RoboticArmEnv` wrap
 Install with:
 
 ```bash
-pip install git+ssh://git@github.com:ElyasYassin/robosuite.git
+pip install git+ssh://git@github.com/ElyasYassin/robosuite.git
 ```
 
 The task uses `moving_target=False` (static pen position) for the initial training phase. Switch to `moving_target=True` for the dynamic tracking phase.
