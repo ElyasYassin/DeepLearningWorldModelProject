@@ -1,0 +1,21 @@
+base_config: ../experiments/ppo_resnet18_lstm_ft.yaml
+
+optuna:
+  study_name: resnet18_lstm_ft_short
+  storage: sqlite:///optuna_studies/resnet18_lstm_ft_short.db
+  n_trials: 5
+  direction: maximize
+  objective_metric: mean_reward
+  eval_episodes: 5
+  train_timesteps: 300_000
+
+  search_space:
+    learning_rate:
+      low: 3.0e-5
+      high: 3.0e-4
+      log: true
+    n_steps: [256, 512, 1024]
+    lstm_hidden_size: [128, 256, 512]
+    unfreeze_layers:
+      layer4: ["layer4"]
+      # layer3_layer4: ["layer3", "layer4"]
