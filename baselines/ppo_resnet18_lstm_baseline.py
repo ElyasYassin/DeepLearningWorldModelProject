@@ -1,6 +1,12 @@
 import sys
 from sb3_contrib import RecurrentPPO
-from stable_baselines3.common.vec_env import DummyVecEnv, VecTransposeImage, VecMonitor
+from stable_baselines3.common.vec_env import (
+    DummyVecEnv,
+    SubprocVecEnv,
+    VecMonitor,
+    VecTransposeImage,
+)
+
 
 from sim.env import RoboticArmEnv
 from models.resnet_proprio_extractor import ResnetProprioExtractor
@@ -12,12 +18,20 @@ def train(config: dict):
     log_dir = config["evaluation"]["log_dir"]
 
     def make_env():
-        return RoboticArmEnv(config, moving_target=False)
+        def _init():
+            return RoboticArmEnv(config, moving_target=False)
 
-    env = DummyVecEnv([make_env])
+        return _init
+
+    n_envs = cfg.get("n_envs", 1)
+
+    if n_envs > 1:
+        env = SubprocVecEnv([make_env() for _ in range(n_envs)])
+    else:
+        env = DummyVecEnv([make_env()])
+
     env = VecTransposeImage(env)
     env = VecMonitor(env)
-
     policy_kwargs = dict(
         features_extractor_class=ResnetProprioExtractor,
         features_extractor_kwargs=dict(
@@ -43,6 +57,7 @@ def train(config: dict):
         policy_kwargs=policy_kwargs,
         verbose=1,
         tensorboard_log=log_dir,
+        device=cfg.get("device", "auto"),
     )
 
     model.learn(

@@ -8,13 +8,18 @@ where the target was last seen — key for the wrist-camera partial observabilit
 Compare against ppo_baseline.py (stateless CnnPolicy) to measure the benefit of memory.
 
 Usage:
-    python baselines/ppo_lstm_baseline.py configs/default.yaml
+    python -m baselines.ppo_lstm_baseline configs/experiments/ppo_lstm.yaml
 """
 
 import sys
 
 from sb3_contrib import RecurrentPPO
-from stable_baselines3.common.vec_env import DummyVecEnv, VecTransposeImage, VecMonitor
+from stable_baselines3.common.vec_env import (
+    DummyVecEnv,
+    SubprocVecEnv,
+    VecMonitor,
+    VecTransposeImage,
+)
 
 from sim.env import RoboticArmEnv
 from utils.config import load_config
@@ -25,10 +30,18 @@ def train(config: dict):
     log_dir = config["evaluation"]["log_dir"]
 
     def make_env():
-        return RoboticArmEnv(config, moving_target=False)
+        def _init():
+            return RoboticArmEnv(config, moving_target=False)
 
-    # VecTransposeImage: (H,W,C) → (C,H,W) for the CNN image branch
-    env = DummyVecEnv([make_env])
+        return _init
+
+    n_envs = lstm_cfg.get("n_envs", 1)
+
+    if n_envs > 1:
+        env = SubprocVecEnv([make_env() for _ in range(n_envs)])
+    else:
+        env = DummyVecEnv([make_env()])
+
     env = VecTransposeImage(env)
     env = VecMonitor(env)
 
@@ -48,6 +61,7 @@ def train(config: dict):
         ),
         verbose=1,
         tensorboard_log=log_dir,
+        device=lstm_cfg.get("device", "auto"),
     )
 
     model.learn(

@@ -5,14 +5,18 @@ Uses stable-baselines3 PPO with CnnPolicy (no world model).
 Serves as a comparison target against the Dreamer-style world model controller.
 
 Usage:
-    python baselines/ppo_baseline.py configs/default.yaml
+    python -m baselines.ppo_baseline configs/experiments/ppo.yaml
 """
 
 import sys
 
 from stable_baselines3 import PPO
-from stable_baselines3.common.vec_env import DummyVecEnv, VecTransposeImage
-from stable_baselines3.common.vec_env import VecMonitor
+from stable_baselines3.common.vec_env import (
+    DummyVecEnv,
+    SubprocVecEnv,
+    VecMonitor,
+    VecTransposeImage,
+)
 
 from sim.env import RoboticArmEnv
 from utils.config import load_config
@@ -23,10 +27,18 @@ def train(config: dict):
     log_dir = config["evaluation"]["log_dir"]
 
     def make_env():
-        return RoboticArmEnv(config, moving_target=False)
+        def _init():
+            return RoboticArmEnv(config, moving_target=False)
 
-    # VecTransposeImage handles (H,W,C) → (C,H,W) for the image branch of MultiInputPolicy
-    env = DummyVecEnv([make_env])
+        return _init
+
+    n_envs = ppo_cfg.get("n_envs", 1)
+
+    if n_envs > 1:
+        env = SubprocVecEnv([make_env() for _ in range(n_envs)])
+    else:
+        env = DummyVecEnv([make_env()])
+
     env = VecTransposeImage(env)
     env = VecMonitor(env)
 
@@ -40,6 +52,7 @@ def train(config: dict):
         gamma=0.99,
         verbose=1,
         tensorboard_log=log_dir,
+        device=ppo_cfg.get("device", "auto"),
     )
 
     model.learn(

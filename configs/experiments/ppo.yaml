@@ -3,10 +3,12 @@ base_config: ../default.yaml
 baselines:
   ppo:
     learning_rate: 3.0e-4
-    n_steps: 2048
-    batch_size: 64
-    n_epochs: 10
+    n_envs: 8
+    n_steps: 512
+    batch_size: 512
+    n_epochs: 5
     gamma: 0.99
     total_timesteps: 1_000_000
+    device: cuda
     tb_log_name: ppo
     save_path: trained_models/ppo_target_tracking
