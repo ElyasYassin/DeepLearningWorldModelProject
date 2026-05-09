@@ -50,6 +50,7 @@ dist/
 *.log
 *.out
 *.err
+.claude/
 tmp/
 temp/
 logs/
