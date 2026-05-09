@@ -83,6 +83,7 @@ Thumbs.db
 
 data/
 datasets/
+results/
 *.csv
 *.h5
 *.pth
