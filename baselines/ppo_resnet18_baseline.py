@@ -9,7 +9,12 @@ Usage:
 
 import sys
 from stable_baselines3 import PPO
-from stable_baselines3.common.vec_env import DummyVecEnv, VecTransposeImage, VecMonitor
+from stable_baselines3.common.vec_env import (
+    DummyVecEnv,
+    SubprocVecEnv,
+    VecMonitor,
+    VecTransposeImage,
+)
 
 from sim.env import RoboticArmEnv
 from models.resnet_proprio_extractor import ResnetProprioExtractor
@@ -21,12 +26,19 @@ def train(config: dict):
     log_dir = config["evaluation"]["log_dir"]
 
     def make_env():
-        return RoboticArmEnv(config, moving_target=False)
+        def _init():
+            return RoboticArmEnv(config, moving_target=False)
 
-    env = DummyVecEnv([make_env])
-    env = VecTransposeImage(
-        env
-    )  # converts image branch to channel-first for SB3 handling
+        return _init
+
+    n_envs = ppo_cfg.get("n_envs", 1)
+
+    if n_envs > 1:
+        env = SubprocVecEnv([make_env() for _ in range(n_envs)])
+    else:
+        env = DummyVecEnv([make_env()])
+
+    env = VecTransposeImage(env)
     env = VecMonitor(env)
 
     policy_kwargs = dict(
@@ -52,6 +64,7 @@ def train(config: dict):
         policy_kwargs=policy_kwargs,
         verbose=1,
         tensorboard_log=log_dir,
+        device=ppo_cfg.get("device", "auto"),
     )
 
     model.learn(

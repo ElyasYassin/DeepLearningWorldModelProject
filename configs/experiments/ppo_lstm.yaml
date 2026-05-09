@@ -2,13 +2,15 @@ base_config: ../default.yaml
 
 baselines:
   ppo_lstm:
-    learning_rate: 1.0e-4
-    n_steps: 2048
-    batch_size: 128
-    n_epochs: 10
+    learning_rate: 3.0e-4
+    n_envs: 8
+    n_steps: 512
+    batch_size: 512
+    n_epochs: 5
     gamma: 0.99
     lstm_hidden_size: 256
     n_lstm_layers: 1
     total_timesteps: 1_000_000
+    device: cuda
     tb_log_name: lstm_ppo
     save_path: trained_models/ppo_lstm_target_tracking

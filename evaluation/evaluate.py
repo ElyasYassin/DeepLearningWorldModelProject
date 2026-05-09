@@ -150,6 +150,14 @@ def evaluate(
     print(f"Tracking accuracy: {np.mean(ep_distances):.4f} m (mean dist to target)")
     if ep_fluidity:
         print(f"Fluidity (jerk²) : {np.mean(ep_fluidity):.6f}")
+    return {
+        "episodes": len(ep_rewards),
+        "mean_reward": float(np.mean(ep_rewards)),
+        "std_reward": float(np.std(ep_rewards)),
+        "success_rate": float(np.mean(ep_successes)),
+        "mean_distance": float(np.mean(ep_distances)),
+        "mean_fluidity": float(np.mean(ep_fluidity)) if ep_fluidity else None,
+    }
 
 
 if __name__ == "__main__":

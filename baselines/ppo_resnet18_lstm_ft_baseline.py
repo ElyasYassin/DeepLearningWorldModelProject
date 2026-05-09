@@ -7,13 +7,18 @@ This combines:
     [visual features ; proprio] -> LSTM policy -> action
 
 Usage:
-    python baselines/ppo_resnet18_lstm_ft_baseline.py configs/default.yaml
+    python -m baselines.ppo_resnet18_lstm_ft_baseline configs/experiments/ppo_resnet18_lstm_ft.yaml
 """
 
 import sys
 
 from sb3_contrib import RecurrentPPO
-from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor, VecTransposeImage
+from stable_baselines3.common.vec_env import (
+    DummyVecEnv,
+    SubprocVecEnv,
+    VecMonitor,
+    VecTransposeImage,
+)
 
 from models.resnet_proprio_extractor_ft import ResnetProprioExtractorFT
 from sim.env import RoboticArmEnv
@@ -25,9 +30,18 @@ def train(config: dict):
     log_dir = config["evaluation"]["log_dir"]
 
     def make_env():
-        return RoboticArmEnv(config, moving_target=False)
+        def _init():
+            return RoboticArmEnv(config, moving_target=False)
 
-    env = DummyVecEnv([make_env])
+        return _init
+
+    n_envs = cfg.get("n_envs", 1)
+
+    if n_envs > 1:
+        env = SubprocVecEnv([make_env() for _ in range(n_envs)])
+    else:
+        env = DummyVecEnv([make_env()])
+
     env = VecTransposeImage(env)
     env = VecMonitor(env)
 
@@ -58,6 +72,7 @@ def train(config: dict):
         policy_kwargs=policy_kwargs,
         verbose=1,
         tensorboard_log=log_dir,
+        device=cfg.get("device", "auto"),
     )
 
     model.learn(

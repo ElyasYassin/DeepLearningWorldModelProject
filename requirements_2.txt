@@ -9,3 +9,6 @@ gymnasium>=0.29.0
 
 # Logging
 tensorboard>=2.14.0
+
+# Hyperparameter tuning
+optuna>=3.6.0

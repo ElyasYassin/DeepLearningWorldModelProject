@@ -50,9 +50,11 @@ dist/
 *.log
 *.out
 *.err
+.claude/
 tmp/
 temp/
-
+logs/
+optuna_studies/
 # =========================
 
 # OS files
@@ -81,6 +83,7 @@ Thumbs.db
 
 data/
 datasets/
+results/
 *.csv
 *.h5
 *.pth

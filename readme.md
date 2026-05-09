@@ -181,9 +181,6 @@ python -m baselines.ppo_resnet18_lstm_baseline configs/experiments/ppo_resnet18_
 python -m baselines.ppo_resnet18_ft_baseline configs/experiments/ppo_resnet18_ft.yaml
 python -m baselines.ppo_resnet18_lstm_ft_baseline configs/experiments/ppo_resnet18_lstm_ft.yaml
 
-# Hyperparameter tuning example
-python -m baselines.ppo_resnet18_lstm_ft_baseline configs/tuning/lstm_ft_lr5e5.yaml
-```
 
 ### Evaluation and logs
 
