@@ -1,0 +1,18 @@
+base_config: ../experiments/ppo_lstm.yaml
+
+optuna:
+  baseline_key: ppo_lstm
+  train_module: baselines.ppo_lstm_baseline
+  artifact_prefix: optuna_ppo_lstm
+  study_name: optuna_ppo_lstm_baseline
+  storage: sqlite:///optuna_studies/optuna_ppo_lstm_baseline.db
+  n_trials: 10
+  direction: maximize
+  objective_metric: mean_reward
+  eval_episodes: 5
+  train_timesteps: 500_000
+
+  search_space:
+    learning_rate: [5.0e-5, 1.0e-4, 3.0e-4]
+    n_steps: [512, 1024]
+    lstm_hidden_size: [128, 256]

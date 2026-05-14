@@ -1,0 +1,20 @@
+base_config: ../experiments/ppo_resnet18_ft.yaml
+
+optuna:
+  baseline_key: ppo_resnet18_ft
+  train_module: baselines.ppo_resnet18_ft_baseline
+  artifact_prefix: optuna_ppo_resnet18_ft
+  study_name: optuna_ppo_resnet18_ft_baseline
+  storage: sqlite:///optuna_studies/optuna_ppo_resnet18_ft_baseline.db
+  n_trials: 6
+  direction: maximize
+  objective_metric: mean_reward
+  eval_episodes: 5
+  train_timesteps: 500_000
+
+  search_space:
+    learning_rate: [5.0e-5, 1.0e-4, 2.0e-4]
+    n_steps: [512, 1024]
+    unfreeze_layers:
+      layer4: ["layer4"]
+      # layer3_layer4: ["layer3", "layer4"]

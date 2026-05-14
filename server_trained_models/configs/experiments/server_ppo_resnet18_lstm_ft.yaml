@@ -1,0 +1,23 @@
+base_config: ../default.yaml
+
+env:
+  image_size: 224
+
+baselines:
+  ppo_resnet18_lstm_ft:
+    learning_rate: 1.0e-3
+    n_envs: 50
+    n_steps: 512
+    batch_size: 1024
+    n_epochs: 5
+    gamma: 0.99
+    total_timesteps: 5_000_000
+    visual_dim: 128
+    unfreeze_layers: ["layer4"]
+    lstm_hidden_size: 128
+    n_lstm_layers: 1
+    policy_hidden_sizes: [128]
+    value_hidden_sizes: [128]
+    device: cuda
+    tb_log_name: server_resnet18_lstm_ft_img224_5M
+    save_path: trained_models/server_ppo_resnet18_lstm_ft_imge224_5M

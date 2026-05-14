@@ -1,0 +1,23 @@
+base_config: ../default.yaml
+
+env:
+  image_size: 64
+
+baselines:
+  ppo_resnet18_lstm_ft:
+    learning_rate: 3.0e-4
+    n_envs: 8
+    n_steps: 256
+    batch_size: 512
+    n_epochs: 5
+    gamma: 0.99
+    total_timesteps: 100_000
+    visual_dim: 128
+    unfreeze_layers: ["layer4"]
+    lstm_hidden_size: 256
+    n_lstm_layers: 1
+    policy_hidden_sizes: [128]
+    value_hidden_sizes: [128]
+    device: cuda
+    tb_log_name: img64_resnet18_lstm_ft_test
+    save_path: trained_models/img64_ppo_resnet18_lstm_ft_test

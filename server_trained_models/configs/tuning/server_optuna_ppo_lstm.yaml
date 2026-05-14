@@ -1,0 +1,16 @@
+base_config: ../experiments/server_ppo_lstm.yaml
+
+optuna:
+  baseline_key: ppo_lstm
+  train_module: baselines.ppo_lstm_baseline
+  artifact_prefix: optuna_server_ppo_lstm
+  study_name: optuna_server_ppo_lstm_baseline_img224
+  storage: sqlite:///optuna_studies/optuna_server_ppo_lstm_baseline_img224.db
+  n_trials: 6
+  eval_episodes: 10
+  train_timesteps: 500_000
+
+  search_space:
+    learning_rate: [1.0e-5, 1.0e-4, 1.0e-3]
+    n_steps: [512]
+    lstm_hidden_size: [128, 256]

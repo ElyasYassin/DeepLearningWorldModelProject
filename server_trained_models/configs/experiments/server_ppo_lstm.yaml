@@ -1,0 +1,19 @@
+base_config: ../default.yaml
+
+env:
+  image_size: 224
+
+baselines:
+  ppo_lstm:
+    learning_rate: 1.0e-4
+    n_envs: 50
+    n_steps: 512
+    batch_size: 1024
+    n_epochs: 5
+    gamma: 0.99
+    lstm_hidden_size: 128
+    n_lstm_layers: 1
+    total_timesteps: 5_000_000
+    device: cuda
+    tb_log_name: server_lstm_ppo_img224_5M
+    save_path: trained_models/server_ppo_lstm_img224_5M
