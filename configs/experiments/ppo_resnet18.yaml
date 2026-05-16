@@ -1,0 +1,18 @@
+base_config: ../default.yaml
+
+baselines:
+  ppo_resnet18:
+    learning_rate: 5.0e-5
+    n_envs: 8
+    n_steps: 512
+    batch_size: 512
+    n_epochs: 5
+    gamma: 0.99
+    total_timesteps: 1_000_000
+    visual_dim: 128
+    freeze_backbone: true
+    policy_hidden_sizes: [256, 256]
+    value_hidden_sizes: [256, 256]
+    device: cuda
+    tb_log_name: resnet18_ppo
+    save_path: trained_models/ppo_resnet18_target_tracking

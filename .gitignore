@@ -1,0 +1,149 @@
+# =========================
+
+# Python
+
+# =========================
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+
+venv/
+.venv/
+env/
+ENV/
+
+# Distribution / packaging
+
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+
+# Environment variables
+
+# =========================
+
+.env
+.env.*
+!.env.example
+
+# =========================
+
+# Jupyter / Notebooks
+
+# =========================
+
+.ipynb_checkpoints/
+
+# =========================
+
+# Logs & temp files
+
+# =========================
+
+*.log
+*.out
+*.err
+.claude/
+tmp/
+temp/
+logs/
+optuna_studies/
+# =========================
+
+# OS files
+
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+
+# IDEs / Editors
+
+# =========================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+
+# Data (important for ML)
+
+# =========================
+
+data/
+datasets/
+results/
+*.csv
+*.h5
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.zip
+
+# Keep small sample data if needed
+
+!data/sample/
+
+# =========================
+
+# Models & checkpoints
+
+# =========================
+
+trained_models/
+checkpoints/
+runs/
+wandb/
+
+# =========================
+
+# Docker
+
+# =========================
+
+*.env.docker
+docker-compose.override.yml
+
+# =========================
+
+# Build artifacts
+
+# =========================
+
+*.so
+*.dylib
+*.dll
+
+# =========================
+
+# Testing / coverage
+
+# =========================
+
+.coverage
+htmlcov/
+.pytest_cache/
+
+# =========================
+
+# Misc
+
+# =========================
+
+*.bak
+*.tmp
+
+
+docs

@@ -36,13 +36,7 @@ An RL policy trained entirely in latent space to select actions that maximize cu
 
 ## Simulation Environment
 
-The digital twin is built in one of the following simulation engines (to be finalized in Phase 1):
-
-| Engine | Notes |
-|--------|-------|
-| [NVIDIA Isaac Sim](https://developer.nvidia.com/isaac-sim) | Photorealistic, strong ROS2 support |
-| [MuJoCo](https://mujoco.org/) | Lightweight, widely used in RL research |
-| [Gazebo](https://gazebosim.org/) | Open-source, strong ROS ecosystem |
+Built on [MuJoCo](https://mujoco.org/) via [robosuite](https://github.com/ElyasYassin/robosuite). The task is `TargetTracking` — a Panda arm must reach and hold its end-effector at a static target position, observed through a 64×64 RGB camera.
 
 ---
 
@@ -111,7 +105,89 @@ DeepLearningWorldModelProject/
 
 ## Getting Started
 
-> Setup instructions will be added as the simulation environment and dependencies are finalized in Phase 1.
+### Prerequisites
+
+- Python 3.10+
+- MuJoCo (installed automatically with robosuite)
+- A CUDA-capable GPU is recommended for training
+
+### Installation
+
+**1. Clone the repo**
+```bash
+git clone <this-repo>
+cd DeepLearningWorldModelProject
+```
+
+**2. Create and activate a virtual environment**
+```bash
+python -m venv venv
+
+# PowerShell
+venv\Scripts\Activate.ps1
+
+# CMD
+venv\Scripts\activate.bat
+
+# bash / Git Bash
+source venv/Scripts/activate
+```
+
+**3. Install PyTorch** (match your CUDA version at [pytorch.org](https://pytorch.org))
+```bash
+# Example for CUDA 12.4:
+pip install torch --index-url https://download.pytorch.org/whl/cu124
+```
+
+**4. Install the project and remaining dependencies**
+```bash
+pip install -e .
+pip install -r requirements.txt
+```
+
+### Smoke test
+
+```bash
+python -c "
+from sim.env import RoboticArmEnv
+from utils.config import load_config
+cfg = load_config('configs/default.yaml')
+env = RoboticArmEnv(cfg)
+obs, _ = env.reset()
+print('image shape:', obs['image'].shape)
+print('proprio shape:', obs['proprio'].shape)
+env.close()
+"
+```
+
+### Running training
+
+```bash
+# Stage 1 — PPO on raw pixels
+python -m baselines.ppo_baseline configs/experiments/ppo.yaml
+
+# Stage 2 / 3 — world model pipeline (in order)
+python -m training.train_encoder configs/default.yaml
+python -m training.train_dynamics configs/default.yaml
+python -m training.train_controller configs/default.yaml
+```
+
+### Baseline experiments and tuning
+
+```bash
+python -m baselines.ppo_lstm_baseline configs/experiments/ppo_lstm.yaml
+python -m baselines.ppo_resnet18_baseline configs/experiments/ppo_resnet18.yaml
+python -m baselines.ppo_resnet18_lstm_baseline configs/experiments/ppo_resnet18_lstm.yaml
+python -m baselines.ppo_resnet18_ft_baseline configs/experiments/ppo_resnet18_ft.yaml
+python -m baselines.ppo_resnet18_lstm_ft_baseline configs/experiments/ppo_resnet18_lstm_ft.yaml
+
+
+### Evaluation and logs
+
+```bash
+python -m evaluation.evaluate configs/tuning/lstm_ft_lr5e5.yaml --model trained_models/ppo_resnet18_lstm_ft_lr5e5_layer4_lstm128.zip --episodes 20
+tensorboard --logdir=logs
+```
 
 ---
 
